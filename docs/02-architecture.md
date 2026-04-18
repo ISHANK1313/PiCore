@@ -95,8 +95,9 @@ Docker internal
 | nextcloud-db-1 | Separate (`docker-compose-snippet.yml` via Portainer) | mariadb:10.6 | 3306 | — | 200MB |
 | portainer | Separate host deployment | portainer/portainer-ce | 9000,9443 | 9000,9443 | — |
 
-**Total allocated container limits:** ~1.1GB RAM across explicitly limited
-containers. Because this exceeds the Pi's 1GB physical RAM (typically
+**Total allocated container limits:** ~1.04GB RAM (rounded to ~1.1GB) across
+explicitly limited containers. Because this exceeds the Pi's 1GB physical RAM
+(typically
 ~50-100MB reserved for GPU), this design relies on the configured 2GB swapfile
 under concurrent load and traffic spikes, with reduced performance expected
 when swapping is active. Containers without explicit limits can raise real
