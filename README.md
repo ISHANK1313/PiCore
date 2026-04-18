@@ -1,6 +1,6 @@
 <div align="center">
 
-# PiCore: Edge Cloud Platform
+# PiCore: Single Node Edge Cloud Platform
 
 ![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?style=for-the-badge&logo=spring&logoColor=white)
