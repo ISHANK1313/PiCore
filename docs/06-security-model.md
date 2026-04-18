@@ -58,7 +58,8 @@ To                         Action      From
 - SSH and web ingress are allowed through the Tailscale interface only
 - LAN-facing interfaces (`eth0`, `wlan0`) deny direct 80/443 access
 - Keep `80/tcp on tailscale0` only when you intentionally enforce an
-  HTTP→HTTPS redirect path; otherwise omit that allow rule
+  HTTP→HTTPS redirect path; otherwise omit that allow rule and expect plain
+  HTTP requests to fail instead of redirecting
 - This keeps service access aligned with Layer 1 ZTNA instead of broad
   "ALLOW Anywhere" firewall exposure
 - **Optional LAN exception:** if local direct access is intentionally required,

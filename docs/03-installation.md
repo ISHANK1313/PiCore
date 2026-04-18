@@ -198,7 +198,8 @@ docker run -d \
 
 ### 5.3 Deploy Nextcloud stack in Portainer from snippet
 
-1. Open Portainer (`https://<pi-ip>:9443` or `http://<pi-ip>:9000`).
+1. Open Portainer (`https://<pi-ip>:9443` preferred; use `http://<pi-ip>:9000`
+   only for initial local setup on a trusted network).
 2. Go to **Stacks → Add stack**.
 3. Name it `nextcloud`.
 4. Paste the contents of `infrastructure/docker-compose-snippet.yml` (it sets
