@@ -49,7 +49,7 @@ To                         Action      From
 --                         ------      ----
 22/tcp on tailscale0       ALLOW IN    Anywhere
 443/tcp on tailscale0      ALLOW IN    Anywhere
-80/tcp on tailscale0       ALLOW IN    Anywhere (enable only when using HTTP→HTTPS redirect)
+80/tcp on tailscale0       ALLOW IN    Anywhere
 80/tcp on eth0,wlan0       DENY IN     Anywhere
 443/tcp on eth0,wlan0      DENY IN     Anywhere
 ```
@@ -57,6 +57,8 @@ To                         Action      From
 **What this means:**
 - SSH and web ingress are allowed through the Tailscale interface only
 - LAN-facing interfaces (`eth0`, `wlan0`) deny direct 80/443 access
+- Keep `80/tcp on tailscale0` only when you intentionally enforce an
+  HTTP→HTTPS redirect path; otherwise omit that allow rule
 - This keeps service access aligned with Layer 1 ZTNA instead of broad
   "ALLOW Anywhere" firewall exposure
 - **Optional LAN exception:** if local direct access is intentionally required,

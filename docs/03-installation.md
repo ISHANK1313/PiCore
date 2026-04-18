@@ -201,7 +201,9 @@ docker run -d \
 1. Open Portainer (`https://<pi-ip>:9443` or `http://<pi-ip>:9000`).
 2. Go to **Stacks → Add stack**.
 3. Name it `nextcloud`.
-4. Paste the contents of `infrastructure/docker-compose-snippet.yml`.
+4. Paste the contents of `infrastructure/docker-compose-snippet.yml` (it sets
+   explicit `container_name`, so the deployed names stay
+   `nextcloud-app-1` and `nextcloud-db-1`).
 5. Replace all `CHANGE_ME_*` values with strong secrets.
 6. Click **Deploy the stack**.
 
@@ -209,8 +211,6 @@ Verify Nextcloud stack containers:
 ```bash
 docker ps --format "table {{.Names}}\t{{.Status}}" | grep -E "nextcloud-app-1|nextcloud-db-1"
 ```
-(`infrastructure/docker-compose-snippet.yml` sets explicit `container_name`, so
-these names stay stable.)
 
 ---
 
