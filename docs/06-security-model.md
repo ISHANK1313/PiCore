@@ -47,17 +47,24 @@ sudo nmap -p 1-65535 <your-public-ip>
 ```
 To                         Action      From
 --                         ------      ----
-22/tcp                     ALLOW       Anywhere
-80/tcp                     ALLOW       Anywhere
-443/tcp                    ALLOW       Anywhere
-Anywhere                   ALLOW       10.56.54.0/24  (local subnet)
+22/tcp on tailscale0       ALLOW IN    Anywhere
+443/tcp on tailscale0      ALLOW IN    Anywhere
+80/tcp on tailscale0       ALLOW IN    Anywhere
+80/tcp on eth0,wlan0       DENY IN     Anywhere
+443/tcp on eth0,wlan0      DENY IN     Anywhere
 ```
 
 **What this means:**
-- SSH (22) open for admin access via Tailscale
-- HTTP/HTTPS (80/443) open for Nginx (Tailscale Funnel terminates here)
-- Local subnet allowed full access (for direct admin on same network)
-- Everything else: DENY by default
+- SSH/web ingress is Tailscale-interface scoped (`tailscale0`) for ZTNA
+- LAN-facing interfaces (`eth0`, `wlan0`) deny direct 80/443 access
+- Explicit `DENY` entries are documented as defense-in-depth guardrails
+- Keep `80/tcp` on `tailscale0` only for HTTP-to-HTTPS redirect; otherwise
+  omit it and let plain HTTP fail
+- This keeps service access aligned with Layer 1 ZTNA instead of broad
+  "ALLOW Anywhere" firewall exposure
+- **Optional LAN exception:** if local direct access is intentionally required,
+  add a specific subnet allow rule and document it explicitly as an exception
+  to strict ZTNA-only access
 
 ---
 

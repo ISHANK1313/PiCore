@@ -147,6 +147,15 @@ docker ps
 
 ## Phase 5 — Deploy the Stack
 
+PiCore runs as two operationally separate stacks:
+1. **Primary stack** (`infrastructure/docker-compose.yml`): jellyfin, nginx proxy manager, uptime-kuma, nas-api, opennas-frontend
+2. **Nextcloud stack** (`infrastructure/docker-compose-snippet.yml`): nextcloud + mariadb, deployed separately in Portainer
+
+Nextcloud is separated to keep heavy file/database workloads isolated so the
+primary stack can be restarted or updated independently.
+
+### 5.1 Deploy primary stack (`docker-compose.yml`)
+
 ```bash
 # Copy docker-compose.yml to Pi
 scp infrastructure/docker-compose.yml ishank@raspberrypi.local:~/
@@ -163,17 +172,44 @@ Verify all containers are running:
 docker ps --format "table {{.Names}}\t{{.Status}}"
 ```
 
-Expected output:
+Expected primary stack containers:
 ```
 NAMES              STATUS
 jellyfin           Up X minutes
 nas-api            Up X minutes
-nextcloud-app-1    Up X minutes
-nextcloud-db-1     Up X minutes
 npm                Up X minutes
 opennas-frontend   Up X minutes
-portainer          Up X minutes
 uptime-kuma        Up X minutes (healthy)
+```
+
+### 5.2 Deploy Portainer (separate from primary compose)
+
+If Portainer is not already installed, deploy it as a separate container:
+```bash
+docker volume create portainer_data
+docker run -d \
+  --name portainer \
+  --restart=unless-stopped \
+  -p 9000:9000 -p 9443:9443 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer-ce:2.21.5
+```
+
+### 5.3 Deploy Nextcloud stack in Portainer from snippet
+
+1. Open Portainer at `https://<pi-ip>:9443` (HTTPS only).
+2. Go to **Stacks → Add stack**.
+3. Name it `nextcloud`.
+4. Paste the contents of `infrastructure/docker-compose-snippet.yml` (it sets
+   explicit `container_name`, so the deployed names stay
+   `nextcloud-app-1` and `nextcloud-db-1`).
+5. Replace all `CHANGE_ME_*` values with strong secrets.
+6. Click **Deploy the stack**.
+
+Verify Nextcloud stack containers:
+```bash
+docker ps --format "table {{.Names}}\t{{.Status}}" | grep -E "nextcloud-app-1|nextcloud-db-1"
 ```
 
 ---
