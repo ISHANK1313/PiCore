@@ -25,6 +25,7 @@
 ## 📖 Table of Contents
 
 - [Overview & Features](#-overview--features)
+- [Tech Stack](#-tech-stack)
 - [Architecture & Flow Diagrams](#-architecture--flow-diagrams)
 - [Screenshots & UI](#-screenshots--ui)
 - [Core Services Stack](#-core-services-stack)
@@ -32,6 +33,7 @@
 - [Comparisons: Cloud vs Synology vs PiCore](#-comparisons-cloud-vs-synology-vs-picore)
 - [Directory Structure / Index](#-directory-structure--index)
 - [Future Enhancements / Roadmap](#-future-enhancements--roadmap)
+- [License](#-license)
 
 ---
 
@@ -48,6 +50,36 @@ PiCore is an exploration of constrained edge-computing. The core features implem
 - **Defense-In-Depth Security:** Multi-layered security using UFW, Fail2Ban, Nginx Rate Limiting, and TLS.
 - **Chaos Engineering & Resilience:** Documented fault-testing, recovery, and bottleneck analysis under high load.
 - **Automated Backup:** Daily cron jobs triggering `rclone sync` to Google Drive.
+
+---
+
+## 💻 Tech Stack
+
+**Backend & API**
+- **Java 17 & Spring Boot 3:** Custom telemetry REST API reading from host OS.
+
+**Frontend & UI**
+- **HTML5/JS/CSS (Nginx Alpine):** Lightweight dashboard for real-time hardware status metrics.
+
+**Infrastructure & Orchestration**
+- **Docker & Docker Compose:** Container orchestration for services.
+- **Portainer CE:** Container management UI.
+- **Raspberry Pi OS Lite (64-bit):** Host operating system.
+
+**Networking & Security**
+- **Tailscale:** Zero-Trust Network Access & Funnel for public ingress.
+- **Nginx Proxy Manager:** Reverse proxy and TLS termination.
+- **UFW & Fail2Ban:** Firewall and intrusion prevention.
+
+**Core Applications**
+- **Nextcloud & MariaDB:** Private cloud and database.
+- **Jellyfin:** Media streaming.
+- **Uptime Kuma:** Service monitoring.
+
+**AI & Automation**
+- **Go (PicoClaw):** Lightweight agent gateway.
+- **Python:** NVIDIA NIM prefix proxy.
+- **NVIDIA NIM (Llama 3.1 8B):** Large Language Model for natural language interactions via Telegram.
 
 ---
 
@@ -95,7 +127,7 @@ How external inputs land in `/mnt/data/` and how those are synchronized with Goo
 
 ## 📸 Screenshots & UI
 
-*(Images fetched directly from the `screenshots/` directory showcasing the Live Dashboard, Telegram Bot interactions, Portainer, NextCloud, testing failure results and system states)*
+*(Images showcasing the Live Dashboard, Telegram Bot interactions, Portainer, NextCloud, testing failure results and system states)*
 
 <div align="center">
   <img src="screenshots/1000103059.jpg" width="45%" style="margin: 5px;">
@@ -162,22 +194,34 @@ PiCore deliberately pushes boundaries of a 1GB Raspberry Pi 4. Known tradeoffs i
 
 ## 📂 Directory Structure / Index
 
-```text
-.
-├── benchmarking/           # JMeter and performance test scripts.
-├── chaos-testing/          # Chaos engineering disruption scripts and validation.
-├── docs/                   # Full documentation suite (Architecture, Install, Security, Comparisons).
-│   ├── diagrams/           # SVG and PNG Mermaid-generated architecture diagrams.
-│   └── *.md                # In-depth overviews (e.g. 09-bottlenecks-and-tradeoffs.md).
-├── frontend/               # The "opennas-frontend" source (Dashboard UI connecting to Spring Boot API).
-├── infrastructure/         # Docker-compose files for primary stack and isolated Nextcloud stack.
-├── monitoring/             # Uptime Kuma/Monitoring related configs.
-├── picoclaw/               # The PicoClaw Go AI Agent gateway & nvidia-proxy integration code.
-├── screenshots/            # Project UI screenshots, Dashboard visuals, Telegram Bot UI.
-├── scripts/                # Bash scripts for utilities, backups (rclone sync), deployment.
-├── security/               # UFW, Fail2ban configuration references.
-└── spring-boot-api/        # The Java backend returning hardware `/api/stats` natively from `/proc` & `/sys`.
-```
+Navigate directly to specific aspects of the project:
+
+- **[docs/](docs/)** — **Full Documentation Suite:**
+  - [01-overview.md](docs/01-overview.md) (Overview)
+  - [02-architecture.md](docs/02-architecture.md) (Architecture Details)
+  - [03-installation.md](docs/03-installation.md) (Installation)
+  - [04-configuration.md](docs/04-configuration.md) (Configuration)
+  - [05-api-reference.md](docs/05-api-reference.md) (API Reference)
+  - [06-security-model.md](docs/06-security-model.md) (Security Model)
+  - [07-benchmarking.md](docs/07-benchmarking.md) (Benchmarking Results)
+  - [08-chaos-testing.md](docs/08-chaos-testing.md) (Chaos Engineering Results)
+  - [09-bottlenecks-and-tradeoffs.md](docs/09-bottlenecks-and-tradeoffs.md) (Deep Dive into Tradeoffs)
+  - [10-comparison-cloud-infra.md](docs/10-comparison-cloud-infra.md) (Full Cloud vs Synology Comparison)
+  - [11-picoclaw-integration.md](docs/11-picoclaw-integration.md) (PicoClaw Integration Notes)
+  - [13-troubleshooting.md](docs/13-troubleshooting.md) (Troubleshooting)
+  - [14-future-roadmap.md](docs/14-future-roadmap.md) (Future Roadmap)
+  - [diagrams/](docs/diagrams/) (All Mermaid generated SVG and PNG images)
+- **[infrastructure/](infrastructure/)** — **Docker Compose configurations:**
+  - [docker-compose.yml](infrastructure/docker-compose.yml) (Primary Core Stack)
+  - [docker-compose-snippet.yml](infrastructure/docker-compose-snippet.yml) (Isolated Nextcloud Stack)
+- **[spring-boot-api/](spring-boot-api/)** — [Hardware Telemetry API Backend](spring-boot-api/README.md).
+- **[frontend/](frontend/)** — [OpenNAS Dashboard Source Code](frontend/README.md).
+- **[picoclaw/](picoclaw/)** — [PicoClaw Go AI Agent Gateway Code](picoclaw/README.md).
+- **[scripts/](scripts/)** — [Bash setup scripts and utilities](scripts/README.md).
+- **[benchmarking/](benchmarking/)** — JMeter load test scripts.
+- **[chaos-testing/](chaos-testing/)** — Chaos engineering disruption scripts.
+- **[security/](security/)** — UFW & Fail2ban configuration references.
+- **[monitoring/](monitoring/)** — Uptime Kuma references.
 
 ---
 
@@ -187,3 +231,9 @@ PiCore deliberately pushes boundaries of a 1GB Raspberry Pi 4. Known tradeoffs i
 - **v1.6.0 — AI Agent Expansion:** PicoClaw NFC Dead Man's Switch for high-risk operations (wipe, reboot). Application-layer rate-limiting in Spring Boot via Bucket4j. Add Gitea self-hosted Git.
 - **v1.7.0 — Security Hardening:** WiFi Anomaly Detection parsing via ESP32. LUKS encrypted `/mnt/data` rest volume. Add Vaultwarden.
 - **v2.0.0 — Multi-Node HA:** Add a secondary Pi as a replica node. Utilize Litestream for MariaDB replication and a HA proxy layer for automated failover.
+
+---
+
+## ⚖️ License
+
+Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
