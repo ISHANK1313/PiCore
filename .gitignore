@@ -1,0 +1,72 @@
+# ── Secrets — NEVER commit ──────────────────────────────────────────
+.env
+*.env
+config.json
+.security.yml
+*secret*
+*password*
+*api_key*
+*token*
+*credential*
+
+# PicoClaw runtime — contains conversation history and API keys
+picoclaw/workspace/sessions/
+picoclaw/workspace/memory/
+picoclaw/workspace/.session*
+~/.picoclaw/sessions/
+
+# Spring Boot build artifacts
+spring-boot-api/target/
+*.jar
+*.war
+*.class
+
+# Docker runtime volumes — not code
+volumes/
+data/
+docker/data/
+
+# Benchmarking raw output — too large for repo
+benchmarking/results/*.raw
+benchmarking/results/*.bin
+
+# Chaos testing logs — too large
+chaos-testing/results/*.log
+
+# Rclone config — contains Google OAuth tokens
+rclone.conf
+.rclone.conf
+
+# OS generated files
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Maven
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# Log files
+*.log
+logs/
+
+# Backup outputs — only keep scripts not actual backup data
+*.tar.gz
+*.zip
+opennas_backups/

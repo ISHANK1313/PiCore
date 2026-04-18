@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "monitors": [
+    {
+      "name": "raspberry",
+      "type": "http",
+      "url": "https://raspberrypi-1.tail2767bf.ts.net/api/health",
+      "interval": 60,
+      "retryInterval": 60,
+      "maxretries": 3,
+      "upsideDown": false,
+      "notificationIDList": [],
+      "tags": ["picore", "api"]
+    },
+    {
+      "name": "nextcloud",
+      "type": "http",
+      "url": "https://raspberrypi-1.tail2767bf.ts.net/apps/files",
+      "interval": 60,
+      "retryInterval": 60,
+      "maxretries": 3,
+      "upsideDown": false,
+      "notificationIDList": [],
+      "tags": ["picore", "nextcloud"]
+    },
+    {
+      "name": "nginx",
+      "type": "http",
+      "url": "https://raspberrypi-1.tail2767bf.ts.net/hub",
+      "interval": 60,
+      "retryInterval": 60,
+      "maxretries": 3,
+      "upsideDown": false,
+      "notificationIDList": [],
+      "tags": ["picore", "nginx"]
+    },
+    {
+      "name": "jellyfin",
+      "type": "http",
+      "url": "https://raspberrypi-1.tail2767bf.ts.net/tv/web/#/home",
+      "interval": 60,
+      "retryInterval": 60,
+      "maxretries": 3,
+      "upsideDown": false,
+      "notificationIDList": [],
+      "tags": ["picore", "jellyfin"]
+    },
+    {
+      "name": "portainer",
+      "type": "http",
+      "url": "http://10.56.54.100:9000",
+      "interval": 60,
+      "retryInterval": 60,
+      "maxretries": 3,
+      "upsideDown": false,
+      "notificationIDList": [],
+      "tags": ["picore", "admin"]
+    }
+  ]
+}

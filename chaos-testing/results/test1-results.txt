@@ -1,0 +1,16 @@
+Test 1: Hard Container Crash (nas-api)
+Date: Fri Mar 27 19:46:06 IST 2026
+Container killed: nas-api (Spring Boot Dashboard API)
+Command used: docker exec nas-api kill -9 1
+
+Observed Downtime: ~4 seconds
+Recovery Status: SUCCESS
+Did Docker auto-restart the container?: YES
+Data corruption detected: NO
+Manual intervention required: NO
+
+Notes:
+- Terminal 3 showed HTTP 200 → 000 (instant) → 000 × 3 probes → 200
+- Docker restart: unless-stopped policy triggered automatically
+- JVM startup + health check accounts for ~3s of the 4s recovery
+- Spring Boot -Xmx180m slows startup vs unconstrained JVM

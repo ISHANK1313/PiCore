@@ -1,0 +1,73 @@
+PiCore Disk Benchmark Results
+Device: /mnt/data (128GB SanDisk USB 3.0)
+Date: Fri Mar 27 2026
+Tool: fio-3.39
+
+================================================================
+TEST 1A: Sequential Read/Write (1MB block, posixaio)
+================================================================
+Command: sudo fio --name=seq_test --ioengine=posixaio --rw=readwrite --bs=1M --size=256M --numjobs=1 --iodepth=1 --directory=/mnt/data
+
+READ:
+  Throughput:     26.2 MiB/s (27.5 MB/s)
+  IOPS:           26
+  Average latency: 33.97 ms
+  Latency p50:    1.01 ms
+  Latency p80:    29.2 ms
+  Latency p90:    29.8 ms
+  Latency p99:    1132 ms   ← SLC cache exhaustion
+  Latency p99.9:  1200 ms
+
+WRITE:
+  Throughput:     24.6 MiB/s (25.8 MB/s)
+  IOPS:           24
+  Average latency: 4.40 ms
+  Latency p50:    1.75 ms
+  Latency p80:    4.56 ms
+  Latency p90:    11.3 ms
+  Latency p99:    23.5 ms
+
+Disk utilization: 96.59%
+Duration: 5035ms
+
+================================================================
+TEST 1B: Random Read/Write (4K block, iodepth=4)
+================================================================
+Command: sudo fio --name=rand_test --ioengine=posixaio --rw=randrw --bs=4k --size=128M --numjobs=1 --iodepth=4 --directory=/mnt/data
+
+READ:
+  Throughput:     2.63 MiB/s (2.695 MB/s)
+  IOPS:           657
+  Average latency: 3.235 ms
+  Latency p50:    1.73 ms
+  Latency p75:    1.99 ms
+  Latency p90:    2.47 ms
+  Latency p95:    2.70 ms
+  Latency p99:    31.9 ms
+  Latency p99.99: 2902 ms   ← extreme stall events
+
+WRITE:
+  Throughput:     2.63 MiB/s (2.693 MB/s)
+  IOPS:           657
+  Average latency: 2.828 ms
+  Latency p50:    1.09 ms
+  Latency p75:    1.35 ms
+  Latency p90:    1.88 ms
+  Latency p95:    2.06 ms
+  Latency p99:    28.2 ms
+
+Disk utilization: 71.77%
+Duration: 24911ms
+
+================================================================
+ANALYSIS
+================================================================
+Key finding: USB flash drive shows SLC cache exhaustion above ~256MB
+sustained write. p99 read latency of 1132ms indicates rare but severe
+stalls under mixed workload. Suitable for single-user NAS at this
+throughput level. Not suitable for >5 concurrent users.
+
+Comparison:
+  Synology DS223 (HDD RAID1): ~225 MB/s seq read, ~5000 IOPS random
+  PiCore:                       26.2 MB/s seq read,   657 IOPS random
+  Ratio: ~8.6x slower sequential, ~7.6x slower random

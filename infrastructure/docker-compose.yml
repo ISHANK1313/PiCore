@@ -1,0 +1,88 @@
+version: '3.8'
+
+# PiCore — Single Node Edge Cloud Platform
+# Tested on Raspberry Pi 4 (1GB RAM), ARM64
+
+services:
+
+  # ── MEDIA SERVER ─────────────────────────────────────────────────────
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=33
+      - PGID=33
+      - TZ=Asia/Kolkata
+    volumes:
+      - jellyfin_config:/config
+      - /mnt/data:/data
+    ports:
+      - "8096:8096"
+    mem_limit: 256m
+    restart: unless-stopped
+
+  # ── REVERSE PROXY ────────────────────────────────────────────────────
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+    volumes:
+      - npm_data:/data
+      - letsencrypt:/etc/letsencrypt
+    restart: unless-stopped
+
+  # ── SERVICE MONITORING ───────────────────────────────────────────────
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    volumes:
+      - kuma_data:/app/data
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+  # ── SPRING BOOT DASHBOARD API ────────────────────────────────────────
+  nas-api:
+    image: custom-nas-api:latest
+    container_name: nas-api
+    privileged: true
+    mem_limit: 180m
+    environment:
+      - PROC_PATH=/host/proc
+      - SYS_PATH=/host/sys
+      - DATA_PATH=/mnt/data
+      - JAVA_OPTS=-Xmx180m -Xms64m -XX:+UseSerialGC -XX:MaxRAM=200m
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /mnt/data:/mnt/data:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/hostname:/etc/hostname:ro
+      - /etc/os-release:/etc/os-release:ro
+    ports:
+      - "8085:8085"
+    restart: unless-stopped
+
+  # ── FRONTEND LANDING PAGE ────────────────────────────────────────────
+  opennas-frontend:
+    image: nginx:alpine
+    container_name: opennas-frontend
+    volumes:
+      - opennas_html:/usr/share/nginx/html
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+
+volumes:
+  jellyfin_config:
+  npm_data:
+  letsencrypt:
+  kuma_data:
+  opennas_html:
+
+networks:
+  default:
+    name: infrastructure

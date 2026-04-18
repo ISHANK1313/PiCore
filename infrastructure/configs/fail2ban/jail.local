@@ -1,0 +1,31 @@
+[DEFAULT]
+bantime  = 3600
+findtime = 600
+maxretry = 5
+backend  = auto
+
+[sshd]
+enabled  = true
+port     = ssh
+logpath  = %(sshd_log)s
+maxretry = 5
+bantime  = 3600
+
+[nextcloud]
+enabled  = true
+port     = http,https
+filter   = nextcloud
+logpath  = /var/lib/docker/volumes/nextcloud_data/_data/data/nextcloud.log
+maxretry = 5
+bantime  = 3600
+
+[nginx-http-auth]
+enabled  = true
+port     = http,https
+logpath  = %(nginx_error_log)s
+
+[nginx-limit-req]
+enabled  = true
+port     = http,https
+logpath  = %(nginx_error_log)s
+maxretry = 10

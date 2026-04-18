@@ -1,0 +1,19 @@
+Test 3: Resource Starvation (RAM & I/O)
+Date: Fri Mar 27 19:51:53 IST 2026
+Load applied: Jellyfin stream + Nextcloud upload + 100 API requests @ 0.2s intervals
+
+Peak RAM Used: ~950Mi (of 905 MiB physical)
+Peak Swap Used: ~1.9Gi (of 2.9 GiB total)
+Max API Latency under load: ~2.8s (baseline: ~1.66s)
+Did the system fatally crash?: NO (Graceful degradation)
+Did Docker memory limits prevent an OOM Kernel Panic?: YES
+SSH remained responsive throughout: YES
+Any container exited unexpectedly: NO
+Containers near mem_limit: nextcloud-app-1 (387/400MB)
+
+Notes:
+- System degraded gracefully: API latency increased but requests succeeded
+- Swap absorbed RAM overflow — 2GB swapfile was critical
+- Docker mem_limit prevented any single container from consuming all memory
+- Without mem_limit declarations, OOM killer would have terminated a container
+- nas-api showed 14.64% CPU during peak (highest of all containers)

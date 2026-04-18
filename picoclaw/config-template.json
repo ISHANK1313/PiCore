@@ -1,0 +1,88 @@
+{
+  "session": {
+    "dm_scope": "per-channel-peer"
+  },
+  "version": 2,
+  "isolation": {},
+  "agents": {
+    "defaults": {
+      "workspace": "/home/ishank/.picoclaw/workspace",
+      "restrict_to_workspace": true,
+      "allow_read_outside_workspace": false,
+      "provider": "openai",
+      "model_name": "nvidia-nemotron",
+      "max_tokens": 32768,
+      "max_tool_iterations": 50,
+      "summarize_message_threshold": 20,
+      "summarize_token_percent": 75,
+      "steering_mode": "one-at-a-time",
+      "subturn": {
+        "max_depth": 0,
+        "max_concurrent": 0,
+        "default_timeout_minutes": 0,
+        "default_token_budget": 0,
+        "concurrency_timeout_sec": 0
+      },
+      "tool_feedback": {
+        "enabled": false,
+        "max_args_length": 300
+      },
+      "split_on_marker": false
+    }
+  },
+  "channels": {
+    "whatsapp": {
+      "enabled": false,
+      "bridge_url": "ws://localhost:3001",
+      "use_native": false,
+      "session_store_path": "",
+      "allow_from": [],
+      "reasoning_channel_id": ""
+    },
+    "telegram": {
+      "enabled": true,
+      "token": "YOUR_BOTFATHER_TOKEN_HERE",
+      "base_url": "",
+      "proxy": "",
+      "allow_from": ["YOUR_NUMERIC_TELEGRAM_ID"],
+      "group_trigger": {},
+      "typing": {
+        "enabled": true
+      },
+      "placeholder": {
+        "enabled": true,
+        "text": ["Thinking... 🤔"]
+      },
+      "streaming": {
+        "enabled": true,
+        "throttle_seconds": 3
+      }
+    }
+  },
+  "providers": [
+    {
+      "model_name": "nvidia-nemotron",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "api_base": "http://127.0.0.1:9099",
+      "api_key": "dummy"
+    },
+    {
+      "model_name": "nvidia-llama",
+      "model": "meta/llama-3.1-8b-instruct",
+      "api_base": "http://127.0.0.1:9099",
+      "api_key": "dummy"
+    },
+    {
+      "model_name": "llama-3.3-70b",
+      "model": "groq/llama-3.3-70b-versatile",
+      "api_base": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_API_KEY_HERE"
+    },
+    {
+      "model_name": "openrouter-auto",
+      "model": "openrouter/auto",
+      "api_base": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_KEY_HERE"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+Test 4: Hardware Storage Failure (Drive unmount)
+Date: Fri Mar 27 19:52:15 IST 2026
+Command used: sudo umount -l /mnt/data
+
+Did Nextcloud safely lock down when the drive vanished?: YES
+Did the database corrupt?: NO
+Recovery Time after remount: ~12 seconds
+Data loss: NONE
+Active upload during failure: YES (file upload was in progress)
+Nextcloud behavior: Graceful error state (did not crash loop)
+MariaDB survived: YES (stored in Docker volume, separate from /mnt/data)
+
+Recovery commands:
+  sudo mount -a
+  docker restart nextcloud-app-1
+
+Notes:
+- Most dangerous test — potential for filesystem and DB corruption
+- MariaDB isolation (Docker volume) was the critical design decision
+- If MariaDB had been stored on /mnt/data, corruption would have occurred
+- Nextcloud showed error page during outage — did not silently fail
+- After remount + restart, all previously uploaded files intact
+- Partial upload during failure: file was absent (expected — not committed)

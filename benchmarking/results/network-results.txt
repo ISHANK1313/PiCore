@@ -1,0 +1,63 @@
+PiCore Network Benchmark Results
+Date: Fri Mar 27 2026
+Tool: iperf3
+
+================================================================
+TEST 2A: Local Network Throughput (LAN)
+================================================================
+Command (from laptop): iperf3 -c 10.56.54.100
+Pi Local IP: 10.56.54.100
+
+Interval       Transfer    Bitrate
+0-1s           2.38 MB     19.6 Mbps
+1-2s           2.38 MB     20.2 Mbps
+2-3s           2.25 MB     18.8 Mbps
+3-4s           2.12 MB     17.7 Mbps
+4-5s           2.38 MB     19.9 Mbps
+5-6s           1.75 MB     14.7 Mbps
+6-7s           2.25 MB     18.9 Mbps
+7-8s           2.38 MB     20.1 Mbps
+8-9s           2.25 MB     19.0 Mbps
+9-10s          2.25 MB     18.7 Mbps
+
+SENDER:   22.4 MB / 10s = 18.7 Mbps
+RECEIVER: 22.2 MB / 10s = 18.6 Mbps
+
+================================================================
+TEST 2B: Tailscale VPN Throughput (WireGuard)
+================================================================
+Command (from laptop): iperf3 -c 100.66.68.83
+Pi Tailscale IP: 100.66.68.83
+
+Interval       Transfer    Bitrate
+0-1s           2.12 MB     17.8 Mbps
+1-2s           2.12 MB     17.7 Mbps
+2-3s           2.38 MB     19.9 Mbps
+3-4s           2.75 MB     23.4 Mbps
+4-5s           2.25 MB     18.8 Mbps
+5-6s           2.88 MB     23.6 Mbps
+6-7s           2.38 MB     19.9 Mbps
+7-8s           2.75 MB     23.2 Mbps
+8-9s           2.50 MB     21.1 Mbps
+9-10s          2.38 MB     19.9 Mbps
+
+SENDER:   24.5 MB / 10s = 20.5 Mbps
+RECEIVER: 24.4 MB / 10s = 19.9 Mbps
+
+================================================================
+ANALYSIS
+================================================================
+VPN overhead: Tailscale adds NEGATIVE overhead in this test
+(20.5 Mbps VPN vs 18.7 Mbps local — likely different routing path)
+
+Bottleneck identified: WiFi adapter (802.11ac)
+  Theoretical max: ~300 Mbps
+  Measured:        ~20 Mbps
+  Utilization:     ~6.7% of theoretical maximum
+
+Wired Gigabit Ethernet would provide ~940 Mbps (47x improvement)
+for file transfer workloads.
+
+For Jellyfin streaming: 1080p H.264 requires ~20-40 Mbps.
+PiCore at 20 Mbps is at the edge for 1080p — tested and confirmed
+working (Dhurandhar 2025 streamed successfully).

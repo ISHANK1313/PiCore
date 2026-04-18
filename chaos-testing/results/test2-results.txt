@@ -1,0 +1,16 @@
+Test 2: Global VPN Server Failure (Tailscale down)
+Date: Fri Mar 27 19:47:27 IST 2026
+Command used: sudo tailscale down / sudo tailscale up
+
+Did public access completely drop?: YES
+Time to recover after Tailscale UP: ~3 seconds
+Did Nginx Proxy Manager require a manual reboot?: NO (Auto-recovered)
+Data integrity affected: NO
+Local LAN access maintained during outage: YES
+
+Notes:
+- All public endpoints unreachable immediately on tailscale down
+- Correct ZTNA behavior: no fallback route exposed
+- tailscale up → routing restored without any service restart
+- Uptime Kuma would log downtime window during outage
+- Local admin access (SSH via LAN) unaffected throughout

@@ -1,0 +1,32 @@
+PiCore Chaos Testing Baseline
+Date: Fri Mar 27 IST 2026
+Captured before any failure tests
+
+System State:
+  Uptime: system up, ~2 hours before testing
+  CPU Temp: 52.0°C
+  Memory: 905 MiB total / 696 MiB used / 43 MiB free / 209 MiB available
+  Swap: 2.9 GiB total / 798 MiB used
+  Docker containers: 8 running
+    jellyfin, nas-api, nextcloud-app-1, nextcloud-db-1,
+    npm, opennas-frontend, portainer, uptime-kuma
+
+API Response:
+  URL: https://raspberrypi-1.tail2767bf.ts.net/api/stats
+  HTTP Status: 200
+  Response time: ~1.66s (nominal — CPU sampling delay by design)
+
+Network:
+  Tailscale status: connected
+  Public URL: accessible from mobile data (confirmed)
+  Local IP: 10.56.54.100
+
+Storage:
+  /mnt/data: mounted, healthy
+  OS drive: 58.8% used (17.6 GB / 29.9 GB)
+  Data drive: 9.7% used (11.7 GB / 120.5 GB)
+
+Security:
+  UFW: active (22, 80, 443 allowed)
+  Fail2Ban: running, 0 banned IPs
+  Tailscale: connected (100.66.68.83)
