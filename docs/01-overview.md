@@ -31,8 +31,12 @@ the core contribution of this project.
 | AI Agent | Telegram bot, NAS automation | PicoClaw (Go, NVIDIA NIM) |
 | Hardware Telemetry | Live system metrics API | Spring Boot 3 (Java) |
 | Service Monitoring | Uptime tracking | Uptime Kuma |
-| Container Management | Docker UI | Portainer CE |
-| DNS Ad Blocking | Network-wide ad filtering | Pi-hole |
+| Container Management | Docker UI | Portainer CE (deployed separately) |
+
+Deployment model:
+- Main stack (`infrastructure/docker-compose.yml`): jellyfin, nginx proxy manager, uptime-kuma, nas-api, opennas-frontend
+- Separate Portainer stack (`infrastructure/docker-compose-snippet.yml`): nextcloud + mariadb
+- Portainer CE itself is deployed separately (standalone container) for stack management
 
 ---
 
@@ -41,7 +45,7 @@ the core contribution of this project.
 | Layer | Tool | What It Does |
 |---|---|---|
 | Network perimeter | Tailscale ZTNA | No open ports, WireGuard tunnels |
-| Firewall | UFW | Allowlist: 22, 80, 443 only |
+| Firewall | UFW | Interface-scoped rules: Tailscale ingress allowed, eth0/wlan0 web ingress denied |
 | Intrusion prevention | Fail2Ban | Ban IPs after 5 failed SSH/web attempts |
 | Rate limiting | Nginx | 10 req/s per IP |
 | Encrypted transport | TLS (auto via Tailscale) | HTTPS for all public endpoints |

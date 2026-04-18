@@ -15,19 +15,19 @@
 │              raspberrypi-1.tail2767bf.ts.net                     │
 │                                                                  │
 │  ┌────────────────────────────────────────────────────────────┐  │
-│  │                  DOCKER STACK                              │  │
+│  │ PRIMARY STACK (infrastructure/docker-compose.yml)          │  │
 │  │                                                            │  │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐ │  │
-│  │  │  Nginx PM    │  │  Nextcloud   │  │    Jellyfin     │ │  │
-│  │  │  (Proxy)     │  │  + MariaDB   │  │  (Media Server) │ │  │
-│  │  │  172.19.0.4  │  │  172.18.0.2  │  │  172.19.0.2     │ │  │
-│  │  └──────────────┘  └──────────────┘  └─────────────────┘ │  │
+│  │  ┌──────────────┐                   ┌─────────────────┐   │  │
+│  │  │  Nginx PM    │                   │    Jellyfin     │   │  │
+│  │  │  (Proxy)     │                   │  (Media Server) │   │  │
+│  │  │  172.19.0.4  │                   │  172.19.0.2     │   │  │
+│  │  └──────────────┘                   └─────────────────┘   │  │
 │  │                                                            │  │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐ │  │
-│  │  │ Spring Boot  │  │  Uptime Kuma │  │   Portainer     │ │  │
-│  │  │  Dashboard   │  │  (Monitor)   │  │   (Docker UI)   │ │  │
-│  │  │  172.19.0.5  │  │  172.19.0.3  │  │  172.17.0.2     │ │  │
-│  │  └──────────────┘  └──────────────┘  └─────────────────┘ │  │
+│  │  ┌──────────────┐  ┌──────────────┐                       │  │
+│  │  │ Spring Boot  │  │  Uptime Kuma │                       │  │
+│  │  │  Dashboard   │  │  (Monitor)   │                       │  │
+│  │  │  172.19.0.5  │  │  172.19.0.3  │                       │  │
+│  │  └──────────────┘  └──────────────┘                       │  │
 │  │                                                            │  │
 │  │  ┌──────────────┐  ┌──────────────────────────────────┐  │  │
 │  │  │  PicoClaw    │  │     opennas-frontend             │  │  │
@@ -36,7 +36,7 @@
 │  │  └──────────────┘  └──────────────────────────────────┘  │  │
 │  └────────────────────────────────────────────────────────────┘  │
 │                                                                  │
-│  Security:  UFW (22,80,443) │ Fail2Ban │ Tailscale ZTNA         │
+│  Security:  UFW (tailscale0 ingress policy) │ Fail2Ban │ Tailscale ZTNA │
 │  Storage:   /dev/sda (28GB OS) │ /dev/sdc (128GB /mnt/data)    │
 │  Memory:    1GB RAM + 2GB swapfile (/swapfile)                  │
 └──────────────────────────────────────────────────────────────────┘
@@ -49,6 +49,14 @@
 ```
 
 ---
+
+Nextcloud is intentionally deployed as a separate Portainer-managed stack using
+`infrastructure/docker-compose-snippet.yml` (not part of the primary
+`infrastructure/docker-compose.yml` stack). This allows independent restarts
+and resource isolation from the always-on core services.
+
+> Note: Internal Docker bridge IPs shown in this document (for example
+> `172.19.0.x`) are illustrative only and are dynamically assigned at runtime.
 
 ## Network Topology
 
@@ -76,18 +84,20 @@ Docker internal
 
 ## Docker Stack — Ports and Memory Limits
 
-| Container | Image | Internal Port | Exposed | mem_limit |
-|---|---|---|---|---|
-| npm | jc21/nginx-proxy-manager | 80,81,443 | 80,81,443 | — |
-| nextcloud-app-1 | nextcloud | 80 | 8080 | 400MB |
-| nextcloud-db-1 | mariadb:10.6 | 3306 | — | 200MB |
-| jellyfin | lscr.io/linuxserver/jellyfin | 8096 | 8096 | 256MB |
-| nas-api | custom-nas-api | 8085 | 8085 | 180MB |
-| uptime-kuma | louislam/uptime-kuma | 3001 | 3001 | — |
-| portainer | portainer/portainer-ce | 9000 | 9000 | — |
-| opennas-frontend | nginx:alpine | 80 | 8081 | — |
+| Container | Stack/Deployment | Image | Internal Port | Exposed | mem_limit |
+|---|---|---|---|---|---|
+| npm | Primary (`docker-compose.yml`) | jc21/nginx-proxy-manager | 80,81,443 | 80,81,443 | — |
+| jellyfin | Primary (`docker-compose.yml`) | lscr.io/linuxserver/jellyfin | 8096 | 8096 | 256MB |
+| nas-api | Primary (`docker-compose.yml`) | custom-nas-api | 8085 | 8085 | 180MB |
+| uptime-kuma | Primary (`docker-compose.yml`) | louislam/uptime-kuma | 3001 | 3001 | — |
+| opennas-frontend | Primary (`docker-compose.yml`) | nginx:alpine | 80 | 8081 | — |
+| nextcloud-app-1 | Separate (`docker-compose-snippet.yml` via Portainer) | nextcloud | 80 | 8080 | 400MB |
+| nextcloud-db-1 | Separate (`docker-compose-snippet.yml` via Portainer) | mariadb:10.6 | 3306 | — | 200MB |
+| portainer | Separate host deployment | portainer/portainer-ce | 9000,9443 | 9000,9443 | — |
 
-**Total always-on RAM budget:** ~850MB RAM + 2GB swap overflow
+**Total allocated container limits:** ~1.1GB RAM. Because this exceeds the
+Pi's 1GB physical RAM (with some reserved for GPU), the system relies heavily
+on the configured 2GB swapfile for stability during traffic spikes.
 
 ---
 
@@ -156,9 +166,9 @@ Layer 1 (Outermost):  Tailscale ZTNA
   Public access only via Tailscale Funnel (managed relay).
 
 Layer 2:  UFW Firewall
-  ALLOW: 22/tcp (SSH), 80/tcp, 443/tcp
-  ALLOW: 10.56.54.0/24 (local subnet only)
-  DENY:  everything else
+  ALLOW: 22/tcp + 443/tcp (80/tcp optional) on tailscale0
+  DENY:  80/443 on eth0 and wlan0
+  OPTIONAL EXCEPTION: LAN subnet allowlist only if explicitly needed
 
 Layer 3:  Nginx Rate Limiting
   10 requests/second per IP
