@@ -193,7 +193,7 @@ docker run -d \
   -p 9000:9000 -p 9443:9443 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v portainer_data:/data \
-  portainer/portainer-ce:latest
+  portainer/portainer-ce:2.21.5
 ```
 
 ### 5.3 Deploy Nextcloud stack in Portainer from snippet

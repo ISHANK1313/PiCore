@@ -57,6 +57,8 @@ To                         Action      From
 **What this means:**
 - SSH and web ingress are allowed through the Tailscale interface only
 - LAN-facing interfaces (`eth0`, `wlan0`) deny direct 80/443 access
+- Explicit `DENY` entries are documented as defense-in-depth guardrails so
+  interface restrictions remain obvious even if broader allow rules are added
 - Keep `80/tcp on tailscale0` only when you intentionally enforce an
   HTTP-to-HTTPS redirect path; otherwise omit that allow rule and expect plain
   HTTP requests to fail instead of redirecting
