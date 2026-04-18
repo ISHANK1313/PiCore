@@ -25,6 +25,7 @@
 ## 📖 Table of Contents
 
 - [Overview & Features](#-overview--features)
+- [Hardware Specifications](#-hardware-specifications)
 - [Tech Stack](#-tech-stack)
 - [Architecture & Flow Diagrams](#-architecture--flow-diagrams)
 - [Screenshots & UI](#-screenshots--ui)
@@ -50,6 +51,21 @@ PiCore is an exploration of constrained edge-computing. The core features implem
 - **Defense-In-Depth Security:** Multi-layered security using UFW, Fail2Ban, Nginx Rate Limiting, and TLS.
 - **Chaos Engineering & Resilience:** Documented fault-testing, recovery, and bottleneck analysis under high load.
 - **Automated Backup:** Daily cron jobs triggering `rclone sync` to Google Drive.
+
+---
+
+## 💾 Hardware Specifications
+
+This project runs completely on a severely constrained physical setup designed to test architectural choices at edge capacity.
+
+| Component | Specification |
+|---|---|
+| **Compute Board** | Raspberry Pi 4 Model B (1GB LPDDR4 RAM variant) |
+| **Processor (CPU)** | ARM Cortex-A72 quad-core @ 1.8GHz (ARM64 Architecture) |
+| **OS Storage (Boot)** | 28GB USB Flash Drive (Running Raspbian OS Lite 64-bit) |
+| **Data Storage** | 128GB USB 3.0 Flash Drive (ext4, mounted at `/mnt/data`) |
+| **Power Supply** | Portable Power Bank acting as a makeshift UPS to prevent sudden power-loss filesystem corruption. |
+| **Networking** | Built-in WiFi (802.11ac) routed over a Tailscale encrypted overlay network. |
 
 ---
 
