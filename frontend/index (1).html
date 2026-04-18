@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OpenNAS — Private Cloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f0f5ff;
+  --surface:  #ffffff;
+  --surface2: #e8eeff;
+  --border:   #c8d4f0;
+  --accent:   #0077cc;
+  --accent2:  #5b21b6;
+  --warn:     #c2410c;
+  --text:     #0f172a;
+  --muted:    #64748b;
+  --green:    #047857;
+  --red:      #dc2626;
+  --purple:   #7c3aed;
+  --pink:     #be185d;
+  --amber:    #b45309;
+  --teal:     #0e7490;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(79,70,229,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(79,70,229,.05) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.18}
+.orb-1{width:600px;height:600px;background:#6366f1;top:-200px;left:-200px}
+.orb-2{width:400px;height:400px;background:#06b6d4;bottom:-100px;right:-100px}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 24px 60px}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 40px;border-bottom:1px solid var(--border);margin-bottom:44px}
+.logo{display:flex;align-items:center;gap:14px}
+.logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.logo-text h1{font-size:1.4rem;font-weight:800;color:#0f172a;letter-spacing:-.02em;line-height:1}
+.logo-text p{font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:3px;letter-spacing:.08em;text-transform:uppercase}
+.status-pill{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:999px;font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);transition:all .3s}
+.status-pill.online{border-color:rgba(0,212,170,.4);color:var(--accent)}
+.status-pill.offline{border-color:rgba(255,68,68,.4);color:var(--red)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:background .3s}
+.status-pill.online .status-dot{background:var(--accent);animation:pulse-dot 2s infinite}
+.status-pill.offline .status-dot{background:var(--red)}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* HERO */
+.hero{margin-bottom:44px}
+.hero-label{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.hero-label::before{content:'';width:20px;height:1px;background:var(--accent)}
+.hero h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:#1e1b4b;line-height:1.05;letter-spacing:-.03em;margin-bottom:12px}
+.hero h2 span{color:var(--accent)}
+.hero p{font-size:.95rem;color:var(--muted);max-width:520px;line-height:1.7}
+
+/* SECTION LABEL */
+.sec{font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;margin-top:40px;display:flex;align-items:center;gap:12px}
+.sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec:first-of-type{margin-top:0}
+
+/* SERVICES */
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:0}
+.srv-btn{display:flex;align-items:center;gap:14px;padding:18px 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);text-decoration:none;font-weight:600;font-size:.92rem;transition:all .2s;position:relative;overflow:hidden}
+.srv-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent),var(--accent2));opacity:0;transition:opacity .2s}
+.srv-btn:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,212,170,.15)}
+.srv-btn:hover::before{opacity:.05}
+.srv-icon{width:38px;height:38px;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;position:relative;z-index:1;transition:background .2s}
+.srv-btn:hover .srv-icon{background:rgba(79,70,229,.10)}
+.srv-label{position:relative;z-index:1}
+.srv-label span{display:block;font-size:.68rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:2px;font-weight:400}
+.srv-arrow{margin-left:auto;color:var(--muted);font-size:1.1rem;position:relative;z-index:1;transition:transform .2s,color .2s}
+.srv-btn:hover .srv-arrow{transform:translateX(3px);color:var(--accent)}
+
+/* PRIMARY STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;position:relative;overflow:hidden;transition:border-color .3s}
+.stat-card.loading{animation:card-pulse 1.5s ease-in-out infinite}
+@keyframes card-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.stat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.stat-label{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.stat-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.stat-val{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:#fff;line-height:1;margin-bottom:6px;transition:color .3s}
+.stat-val .unit{font-size:.9rem;color:var(--muted);margin-left:3px}
+.stat-sub{font-size:.75rem;color:var(--muted);margin-bottom:14px}
+.prog-track{height:4px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1),background .3s;width:0%}
+.bar-ok{background:var(--accent)}
+.bar-warn{background:var(--amber)}
+.bar-crit{background:var(--warn)}
+.temp-ok{color:var(--accent)!important}
+.temp-warm{color:var(--amber)!important}
+.temp-hot{color:var(--warn)!important}
+
+/* SMALL CARDS GRID */
+.mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:900px){.mini-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.mini-grid{grid-template-columns:1fr}}
+.mini-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;transition:border-color .2s}
+.mini-card:hover{border-color:rgba(0,212,170,.3)}
+.mini-label{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.mini-val{font-family:'Space Mono',monospace;font-size:1.05rem;font-weight:700;color:#fff}
+.mini-sub{font-size:.68rem;color:var(--muted);margin-top:3px}
+.mini-bar{height:2px;background:var(--surface2);border-radius:1px;overflow:hidden;margin-top:8px}
+.mini-bar-fill{height:100%;border-radius:1px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+/* LOAD ROW */
+.load-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.load-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.load-val{font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--accent2);line-height:1}
+.load-lbl{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.load-sub{font-size:.68rem;color:var(--muted);margin-top:3px}
+
+/* DISK TWO-COL */
+.disk-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.disk-grid{grid-template-columns:1fr}}
+.disk-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.disk-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.disk-name{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.disk-pct{font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700}
+.disk-info{font-size:.72rem;color:var(--muted);margin-top:3px}
+.disk-bar{height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-top:10px}
+.disk-bar-fill{height:100%;border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+/* CONTAINERS TAG LIST */
+.ctag-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.ctag-card h4{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.ctag-list{display:flex;flex-wrap:wrap;gap:8px}
+.ctag{padding:4px 12px;background:#ede9fe;border:1px solid #c4b5fd;border-radius:6px;font-family:'Space Mono',monospace;font-size:.68rem;color:var(--purple)}
+
+/* SYSTEM INFO TABLE */
+.sysinfo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:800px){.sysinfo-grid{grid-template-columns:1fr}}
+.sys-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.sys-card h4{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.sys-row{display:flex;justify-content:space-between;align-items:center;padding:.32rem 0;border-bottom:1px solid rgba(30,45,61,.8);font-size:.75rem}
+.sys-row:last-child{border-bottom:none}
+.sys-row .k{color:var(--muted)}
+.sys-row .v{font-family:'Space Mono',monospace;font-weight:700;text-align:right;max-width:58%;word-break:break-all}
+.badge{display:inline-block;padding:.15rem .5rem;border-radius:5px;font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.badge.g{background:rgba(79,70,229,.10);color:var(--accent);border:1px solid rgba(0,212,170,.25)}
+.badge.b{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.badge.p{background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd}
+.badge.r{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+
+/* TERMINAL */
+.terminal{background:#f8faff;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.terminal-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.t-dot{width:10px;height:10px;border-radius:50%}
+.t-dot:nth-child(1){background:#ff5f57}
+.t-dot:nth-child(2){background:#febc2e}
+.t-dot:nth-child(3){background:#28c840}
+.terminal-title{margin-left:8px;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted)}
+.terminal-body{padding:18px 20px;font-family:'Space Mono',monospace;font-size:.73rem;line-height:1.9;max-height:180px;overflow-y:auto}
+.log-line{display:flex;gap:12px}
+.log-time{color:var(--muted);flex-shrink:0}
+.log-msg{color:var(--text)}
+.log-ok{color:var(--accent)}
+.log-warn{color:var(--amber)}
+.log-err{color:var(--red)}
+
+/* NETWORK SPARKLINE inside uptime card */
+.net-chart{display:flex;align-items:flex-end;gap:3px;height:32px;margin-top:10px}
+.net-bar{flex:1;background:rgba(79,70,229,.25);border-radius:2px 2px 0 0;min-height:3px;transition:height .4s}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:44px}
+.tech-badges{display:flex;flex-wrap:wrap;gap:8px}
+.tech-badge{padding:5px 11px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.05em}
+.footer-right{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-align:right}
+#last-update{display:block;margin-top:3px}
+
+/* ANIMATIONS */
+@keyframes fade-up{to{opacity:1;transform:translateY(0)}}
+.fade-in{opacity:0;transform:translateY(16px);animation:fade-up .5s forwards}
+.fade-in:nth-child(1){animation-delay:.05s}
+.fade-in:nth-child(2){animation-delay:.10s}
+.fade-in:nth-child(3){animation-delay:.15s}
+.fade-in:nth-child(4){animation-delay:.20s}
+.fade-in:nth-child(5){animation-delay:.25s}
+
+@media(max-width:600px){header{flex-direction:column;gap:16px;align-items:flex-start}.stats-grid{grid-template-columns:1fr 1fr}footer{flex-direction:column;align-items:flex-start}.footer-right{text-align:left}}
+@media(max-width:400px){.stats-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🗄</div>
+    <div class="logo-text">
+      <h1>OpenNAS</h1>
+      <p>Raspberry Pi · Private Cloud</p>
+    </div>
+  </div>
+  <div class="status-pill offline" id="status-pill">
+    <div class="status-dot"></div>
+    <span id="status-text">Connecting...</span>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero fade-in">
+  <div class="hero-label">Self-Hosted Infrastructure</div>
+  <h2>Your data.<br><span>Your rules.</span></h2>
+  <p>A production-grade private cloud running on Raspberry Pi. Zero big-tech. Full control.</p>
+</div>
+
+<!-- SERVICES -->
+<div class="sec">Services</div>
+<div class="services">
+  <a href="/cloud" class="srv-btn fade-in">
+    <div class="srv-icon">☁️</div>
+    <div class="srv-label">Nextcloud<span>File Storage &amp; Sync</span></div>
+    <div class="srv-arrow">→</div>
+  </a>
+  <a href="/tv/web" class="srv-btn fade-in">
+    <div class="srv-icon">🍿</div>
+    <div class="srv-label">Jellyfin<span>Media Streaming</span></div>
+    <div class="srv-arrow">→</div>
+  </a>
+</div>
+
+<!-- PRIMARY METRICS -->
+<div class="sec">Live Telemetry</div>
+<div class="stats-grid">
+
+  <div class="stat-card loading fade-in">
+    <div class="stat-header">
+      <div class="stat-label">CPU Temperature</div>
+      <div class="stat-icon" style="background:#d1fae5">🌡</div>
+    </div>
+    <div class="stat-val" id="cpu-temp">--<span class="unit">°C</span></div>
+    <div class="stat-sub" id="cpu-temp-sub">Fetching...</div>
+    <div class="prog-track"><div class="prog-fill bar-ok" id="b-cpu-temp"></div></div>
+  </div>
+
+  <div class="stat-card loading fade-in">
+    <div class="stat-header">
+      <div class="stat-label">CPU Usage</div>
+      <div class="stat-icon" style="background:#dbeafe">⚡</div>
+    </div>
+    <div class="stat-val" id="cpu-use" style="color:var(--accent2)">--<span class="unit">%</span></div>
+    <div class="stat-sub" id="cpu-use-sub">Fetching...</div>
+    <div class="prog-track"><div class="prog-fill" id="b-cpu-use" style="background:var(--accent2)"></div></div>
+  </div>
+
+  <div class="stat-card loading fade-in">
+    <div class="stat-header">
+      <div class="stat-label">Memory</div>
+      <div class="stat-icon" style="background:#ede9fe">🧠</div>
+    </div>
+    <div class="stat-val" id="ram-val" style="color:var(--purple)">--<span class="unit">%</span></div>
+    <div class="stat-sub" id="ram-sub">Fetching...</div>
+    <div class="prog-track"><div class="prog-fill" id="b-ram" style="background:var(--purple)"></div></div>
+  </div>
+
+  <div class="stat-card loading fade-in">
+    <div class="stat-header">
+      <div class="stat-label">Uptime</div>
+      <div class="stat-icon" style="background:#d1fae5">⏱</div>
+    </div>
+    <div class="stat-val" id="uptime-val" style="font-size:1.3rem;color:var(--accent)">--</div>
+    <div class="stat-sub" id="uptime-sub">Since last boot</div>
+    <div class="net-chart" id="net-chart"></div>
+  </div>
+
+</div>
+
+<!-- EXTENDED CPU + MEMORY -->
+<div class="sec">Extended CPU &amp; Memory</div>
+<div class="mini-grid">
+
+  <div class="mini-card">
+    <div class="mini-label">CPU Frequency</div>
+    <div class="mini-val" id="cpu-freq" style="color:var(--accent2)">—</div>
+    <div class="mini-sub" id="cpu-freq-range">Max: — · Min: —</div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">CPU Cores</div>
+    <div class="mini-val" id="cpu-cores" style="color:var(--accent2)">4</div>
+    <div class="mini-sub">ARM Cortex-A72</div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">I/O Wait</div>
+    <div class="mini-val" id="io-wait" style="color:var(--amber)">—</div>
+    <div class="mini-sub">CPU blocked on disk</div>
+    <div class="mini-bar"><div class="mini-bar-fill" id="b-iowait" style="background:var(--amber)"></div></div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">CPU Voltage</div>
+    <div class="mini-val" id="cpu-volt" style="color:var(--green)">—</div>
+    <div class="mini-sub">Core voltage</div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">GPU Temperature</div>
+    <div class="mini-val" id="gpu-temp" style="color:var(--amber)">—</div>
+    <div class="mini-sub">VideoCore IV</div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">GPU Memory</div>
+    <div class="mini-val" id="gpu-mem" style="color:var(--teal)">—</div>
+    <div class="mini-sub">GPU RAM split</div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">RAM Cached</div>
+    <div class="mini-val" id="ram-cached" style="color:var(--purple)">—</div>
+    <div class="mini-sub" id="ram-buffers">Buffers: —</div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">RAM Dirty Pages</div>
+    <div class="mini-val" id="ram-dirty" style="color:var(--pink)">—</div>
+    <div class="mini-sub" id="ram-shared">Shared: —</div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">Swap Usage</div>
+    <div class="mini-val" id="swap-pct" style="color:var(--pink)">—</div>
+    <div class="mini-sub" id="swap-sub">—</div>
+    <div class="mini-bar"><div class="mini-bar-fill" id="b-swap" style="background:var(--pink)"></div></div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">Context Switches</div>
+    <div class="mini-val" id="ctx-sw" style="color:var(--teal)">—</div>
+    <div class="mini-sub">Since boot</div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">Interrupts</div>
+    <div class="mini-val" id="interrupts" style="color:var(--teal)">—</div>
+    <div class="mini-sub">Since boot</div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-label">Processes / Threads</div>
+    <div class="mini-val" id="procs" style="color:var(--accent2)">—</div>
+    <div class="mini-sub" id="threads-sub">Threads: —</div>
+  </div>
+
+</div>
+
+<!-- LOAD AVERAGES -->
+<div class="sec">Load Averages</div>
+<div class="load-grid">
+  <div class="load-card">
+    <div class="load-lbl">1 Minute</div>
+    <div class="load-val" id="load-1">—</div>
+    <div class="load-sub" id="load-1-st">—</div>
+  </div>
+  <div class="load-card">
+    <div class="load-lbl">5 Minutes</div>
+    <div class="load-val" id="load-5">—</div>
+    <div class="load-sub">5-min rolling average</div>
+  </div>
+  <div class="load-card">
+    <div class="load-lbl">15 Minutes</div>
+    <div class="load-val" id="load-15">—</div>
+    <div class="load-sub">15-min rolling average</div>
+  </div>
+</div>
+
+<!-- STORAGE -->
+<div class="sec">Storage</div>
+<div class="disk-grid">
+  <div class="disk-card">
+    <div class="disk-head">
+      <span class="disk-name">OS Drive · 28 GB Flash</span>
+      <span class="disk-pct" id="disk-os-pct" style="color:var(--amber)">—</span>
+    </div>
+    <div class="disk-info" id="disk-os-info">—</div>
+    <div class="disk-bar"><div class="disk-bar-fill" id="b-disk-os" style="background:var(--amber)"></div></div>
+  </div>
+  <div class="disk-card">
+    <div class="disk-head">
+      <span class="disk-name">Data Drive · 128 GB Flash</span>
+      <span class="disk-pct" id="disk-data-pct" style="color:var(--accent)">—</span>
+    </div>
+    <div class="disk-info" id="disk-data-info">—</div>
+    <div class="disk-bar"><div class="disk-bar-fill" id="b-disk-data" style="background:var(--accent)"></div></div>
+  </div>
+</div>
+
+<!-- DISK I/O & NETWORK -->
+<div class="sec">Disk I/O &amp; Network</div>
+<div class="mini-grid">
+  <div class="mini-card">
+    <div class="mini-label">Disk Read (total)</div>
+    <div class="mini-val" id="disk-read" style="color:var(--accent)">—</div>
+    <div class="mini-sub" id="disk-read-ops">— read ops</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">Disk Write (total)</div>
+    <div class="mini-val" id="disk-write" style="color:var(--amber)">—</div>
+    <div class="mini-sub" id="disk-write-ops">— write ops</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">Network ↓ RX</div>
+    <div class="mini-val" id="net-rx" style="color:var(--accent)">—</div>
+    <div class="mini-sub" id="net-rx-pkt">— packets</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">Network ↑ TX</div>
+    <div class="mini-val" id="net-tx" style="color:var(--accent2)">—</div>
+    <div class="mini-sub" id="net-tx-pkt">— packets</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">RX Speed</div>
+    <div class="mini-val" id="net-rx-kbps" style="color:var(--accent)">—</div>
+    <div class="mini-sub">KB/s current</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">TX Speed</div>
+    <div class="mini-val" id="net-tx-kbps" style="color:var(--accent2)">—</div>
+    <div class="mini-sub">KB/s current</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">RX Errors / Dropped</div>
+    <div class="mini-val" id="net-rx-err" style="color:var(--red)">—</div>
+    <div class="mini-sub" id="net-rx-drop">Dropped: —</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">TX Errors / Dropped</div>
+    <div class="mini-val" id="net-tx-err" style="color:var(--red)">—</div>
+    <div class="mini-sub" id="net-tx-drop">Dropped: —</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">Docker Containers</div>
+    <div class="mini-val" id="containers" style="color:var(--purple)">—</div>
+    <div class="mini-sub">Running now</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">NTP Status</div>
+    <div class="mini-val" id="ntp-status" style="color:var(--accent)">—</div>
+    <div class="mini-sub" id="sys-time">—</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">Throttle</div>
+    <div class="mini-val" id="throttle-val" style="color:var(--accent)">—</div>
+    <div class="mini-sub" id="voltage-sub">—</div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">System Time</div>
+    <div class="mini-val" id="sys-clock" style="color:var(--teal);font-size:.85rem">—</div>
+    <div class="mini-sub" id="sys-hostname">—</div>
+  </div>
+</div>
+
+<!-- RUNNING CONTAINERS -->
+<div class="sec">Running Containers</div>
+<div class="ctag-card">
+  <h4>Docker Container List</h4>
+  <div class="ctag-list" id="ctag-list"><span style="font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted)">Fetching...</span></div>
+</div>
+
+<!-- SYSTEM INFORMATION -->
+<div class="sec">System Information</div>
+<div class="sysinfo-grid">
+  <div class="sys-card">
+    <h4>Hardware</h4>
+    <div class="sys-row"><span class="k">Device</span><span class="v">Raspberry Pi 4</span></div>
+    <div class="sys-row"><span class="k">RAM</span><span class="v">1 GB LPDDR4</span></div>
+    <div class="sys-row"><span class="k">OS Drive</span><span class="v">28 GB Flash</span></div>
+    <div class="sys-row"><span class="k">Storage</span><span class="v">128 GB USB 3.0</span></div>
+    <div class="sys-row"><span class="k">Power</span><span class="v">Power Bank UPS</span></div>
+    <div class="sys-row"><span class="k">Hostname</span><span class="v" id="sysinfo-hostname">—</span></div>
+  </div>
+  <div class="sys-card">
+    <h4>Software</h4>
+    <div class="sys-row"><span class="k">OS</span><span class="v">Raspberry Pi OS Lite</span></div>
+    <div class="sys-row"><span class="k">Kernel</span><span class="v">Linux</span></div>
+    <div class="sys-row"><span class="k">Kernel Ver</span><span class="v" id="sysinfo-kernel">—</span></div>
+    <div class="sys-row"><span class="k">Arch</span><span class="v">ARM64 (aarch64)</span></div>
+    <div class="sys-row"><span class="k">Runtime</span><span class="v"><span class="badge b">Docker</span></span></div>
+    <div class="sys-row"><span class="k">API</span><span class="v"><span class="badge p">Spring Boot 3</span></span></div>
+  </div>
+  <div class="sys-card">
+    <h4>Network &amp; Status</h4>
+    <div class="sys-row"><span class="k">Public Access</span><span class="v"><span class="badge b">Tailscale Funnel</span></span></div>
+    <div class="sys-row"><span class="k">Admin Access</span><span class="v"><span class="badge g">Tailscale VPN</span></span></div>
+    <div class="sys-row"><span class="k">Reverse Proxy</span><span class="v"><span class="badge b">Nginx PM</span></span></div>
+    <div class="sys-row"><span class="k">Firewall</span><span class="v"><span class="badge g">UFW Active</span></span></div>
+    <div class="sys-row"><span class="k">Protocol</span><span class="v"><span class="badge g">HTTPS / TLS</span></span></div>
+    <div class="sys-row"><span class="k">Voltage</span><span class="v">5.1V · Normal</span></div>
+    <div class="sys-row"><span class="k">Throttle</span><span class="v" id="sysinfo-throttle"><span class="badge g">NONE</span></span></div>
+  </div>
+</div>
+
+<!-- SYSTEM LOG TERMINAL -->
+<div class="sec">System Log</div>
+<div class="terminal">
+  <div class="terminal-bar">
+    <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+    <span class="terminal-title">opennas@raspberrypi — system monitor</span>
+  </div>
+  <div class="terminal-body" id="log-body">
+    <div class="log-line">
+      <span class="log-time" id="boot-time">--:--:--</span>
+      <span class="log-msg">OpenNAS dashboard initializing...</span>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="tech-badges">
+    <span class="tech-badge">Raspberry Pi 4</span>
+    <span class="tech-badge">RPi OS Lite</span>
+    <span class="tech-badge">Docker</span>
+    <span class="tech-badge">Spring Boot 3</span>
+    <span class="tech-badge">Nginx</span>
+    <span class="tech-badge">Tailscale</span>
+    <span class="tech-badge">Nextcloud</span>
+    <span class="tech-badge">Jellyfin</span>
+    <span class="tech-badge">UFW</span>
+    <span class="tech-badge">ARM64</span>
+  </div>
+  <div class="footer-right">
+    OpenNAS · Self-Hosted Private Cloud
+    <span id="last-update">Never updated</span>
+  </div>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+const API      = '/api/stats';
+const INTERVAL = 5000;
+const netHistory = new Array(20).fill(0);
+
+const $ = id => document.getElementById(id);
+function txt(id, v)  { const e=$(id); if(e) e.textContent=v; }
+function html(id, v) { const e=$(id); if(e) e.innerHTML=v; }
+function bar(id, pct, col) {
+  const e=$(id); if(!e) return;
+  e.style.width = Math.min(pct||0, 100)+'%';
+  if(col) e.style.background=col;
+}
+
+function now() { return new Date().toLocaleTimeString('en-IN',{hour12:false}); }
+
+function addLog(msg, type='') {
+  const body = $('log-body');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">${now()}</span><span class="log-msg ${type}">${msg}</span>`;
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
+  if(body.children.length > 30) body.removeChild(body.firstChild);
+}
+
+function setStatus(online) {
+  const pill = $('status-pill'), txt2 = $('status-text');
+  pill.className = 'status-pill '+(online?'online':'offline');
+  txt2.textContent = online ? 'System Online' : 'API Offline';
+}
+
+function barClass(pct) { return pct<60?'bar-ok':pct<80?'bar-warn':'bar-crit'; }
+
+function setProgBar(id, pct) {
+  const e=$(id); if(!e) return;
+  e.style.width = pct+'%';
+  e.className = 'prog-fill '+barClass(pct);
+}
+
+function tempClass(t) { return t<60?'temp-ok':t<75?'temp-warm':'temp-hot'; }
+
+function fmtNum(n) {
+  if(n==null) return '—';
+  return n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(0)+'K':String(n);
+}
+
+function fmtGhz(mhz) { return mhz>=1000?(mhz/1000).toFixed(2)+' GHz':mhz.toFixed(0)+' MHz'; }
+
+function loadLabel(l) { return l<1?'● IDLE':l<2?'● NORMAL':l<3.5?'● ELEVATED':'● HIGH'; }
+
+function renderNetChart(val) {
+  netHistory.shift(); netHistory.push(val);
+  const max = Math.max(...netHistory,1);
+  const chart = $('net-chart');
+  if(!chart) return;
+  chart.innerHTML = netHistory.map(v=>{
+    const pct = Math.round((v/max)*100);
+    return `<div class="net-bar" style="height:${Math.max(pct,5)}%"></div>`;
+  }).join('');
+}
+
+async function fetchStats() {
+  try {
+    const res = await fetch(API);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('loading'));
+
+    // Helper: safely call .toFixed() — returns '—' if value is null/undefined
+    const fix = (v, n = 1) => (v != null ? Number(v).toFixed(n) : '—');
+
+    // ── Primary cards ──────────────────────────────────────────────
+
+    // CPU Temp
+    const tempEl = $('cpu-temp');
+    if (d.cpuTempCelsius != null) {
+      tempEl.innerHTML = `${fix(d.cpuTempCelsius, 1)}<span class="unit">°C</span>`;
+      tempEl.className = 'stat-val ' + tempClass(d.cpuTempCelsius);
+      setProgBar('b-cpu-temp', Math.min((d.cpuTempCelsius / 85) * 100, 100));
+      txt('cpu-temp-sub', d.cpuTempCelsius < 60 ? 'Normal range'
+        : d.cpuTempCelsius < 75 ? 'Getting warm' : '⚠ Throttling risk');
+    }
+
+    // CPU Usage
+    if (d.cpuUsagePercent != null) {
+      $('cpu-use').innerHTML = `${fix(d.cpuUsagePercent, 1)}<span class="unit">%</span>`;
+      txt('cpu-use-sub', d.cpuUsagePercent < 20 ? '● IDLE'
+        : d.cpuUsagePercent < 50 ? '● ACTIVE'
+        : d.cpuUsagePercent < 75 ? '● BUSY' : '● MAXED');
+      bar('b-cpu-use', d.cpuUsagePercent);
+    }
+
+    // RAM
+    if (d.memoryUsedPercent != null) {
+      $('ram-val').innerHTML = `${fix(d.memoryUsedPercent, 0)}<span class="unit">%</span>`;
+      const usedGB  = d.memoryUsedMB  != null ? (d.memoryUsedMB  / 1024).toFixed(2) : '—';
+      const totalGB = d.memoryTotalMB != null ? (d.memoryTotalMB / 1024).toFixed(2) : '—';
+      txt('ram-sub', `${usedGB} GB / ${totalGB} GB`);
+      bar('b-ram', d.memoryUsedPercent);
+    }
+
+    // Uptime
+    txt('uptime-val', d.uptimeFormatted || '—');
+    txt('uptime-sub', `${d.activeContainers ?? '--'} containers running`);
+    renderNetChart(d.networkRxKbps || 0);
+
+    // ── Extended CPU ───────────────────────────────────────────────
+    if (d.cpuFreqMHz    != null) txt('cpu-freq', fmtGhz(d.cpuFreqMHz));
+    if (d.cpuMaxFreqMHz != null) txt('cpu-freq-range',
+      `Max: ${fmtGhz(d.cpuMaxFreqMHz)} · Min: ${d.cpuMinFreqMHz != null ? fmtGhz(d.cpuMinFreqMHz) : '—'}`);
+    if (d.cpuCores      != null) txt('cpu-cores', d.cpuCores);
+    if (d.cpuIoWaitPercent != null) {
+      txt('io-wait', fix(d.cpuIoWaitPercent, 1) + ' %');
+      bar('b-iowait', d.cpuIoWaitPercent * 5);
+    }
+    if (d.cpuVoltage       != null) txt('cpu-volt', d.cpuVoltage);
+    if (d.gpuTempCelsius   != null) txt('gpu-temp', fix(d.gpuTempCelsius, 1) + ' °C');
+    if (d.gpuMemMB         != null) txt('gpu-mem',  d.gpuMemMB + ' MB');
+
+    // ── Extended Memory ────────────────────────────────────────────
+    if (d.memoryCachedMB  != null) txt('ram-cached',  d.memoryCachedMB + ' MB');
+    if (d.memoryBuffersMB != null) txt('ram-buffers', 'Buffers: ' + d.memoryBuffersMB + ' MB');
+    if (d.memoryDirtyMB   != null) txt('ram-dirty',   d.memoryDirtyMB + ' MB');
+    if (d.memorySharedMB  != null) txt('ram-shared',  'Shared: ' + d.memorySharedMB + ' MB');
+    if (d.swapUsedPercent != null) {
+      txt('swap-pct', fix(d.swapUsedPercent, 1) + '%');
+      txt('swap-sub', `${d.swapUsedMB ?? '—'} MB / ${d.swapTotalMB ?? '—'} MB`);
+      bar('b-swap', d.swapUsedPercent);
+    }
+    if (d.contextSwitches != null) txt('ctx-sw',     fmtNum(d.contextSwitches));
+    if (d.interrupts      != null) txt('interrupts', fmtNum(d.interrupts));
+    if (d.processCount    != null) txt('procs',      d.processCount);
+    if (d.threadCount     != null) txt('threads-sub', 'Threads: ' + d.threadCount);
+
+    // ── Load Averages ──────────────────────────────────────────────
+    txt('load-1',   fix(d.loadAvg1m,  2));
+    txt('load-5',   fix(d.loadAvg5m,  2));
+    txt('load-15',  fix(d.loadAvg15m, 2));
+    txt('load-1-st', d.loadAvg1m != null ? loadLabel(d.loadAvg1m) : '—');
+
+    // ── Storage ────────────────────────────────────────────────────
+    if (d.diskUsedPercent != null) {
+      txt('disk-os-pct',  fix(d.diskUsedPercent, 1) + '%');
+      txt('disk-os-info',
+        `${fix(d.diskUsedGB, 1)} GB used · ${fix(d.diskFreeGB, 1)} GB free of ${fix(d.diskTotalGB, 1)} GB`);
+      bar('b-disk-os', d.diskUsedPercent);
+    }
+    if (d.dataDiskUsedPercent != null) {
+      txt('disk-data-pct',  fix(d.dataDiskUsedPercent, 1) + '%');
+      txt('disk-data-info',
+        `${fix(d.dataDiskUsedGB, 1)} GB used · ${fix(d.dataDiskFreeGB, 1)} GB free of ${fix(d.dataDiskTotalGB, 1)} GB`);
+      bar('b-disk-data', d.dataDiskUsedPercent);
+    }
+
+    // ── Disk I/O ───────────────────────────────────────────────────
+    if (d.diskReadHuman)   txt('disk-read',      d.diskReadHuman);
+    if (d.diskWriteHuman)  txt('disk-write',     d.diskWriteHuman);
+    if (d.diskReadOps  != null) txt('disk-read-ops',  fmtNum(d.diskReadOps)  + ' read ops');
+    if (d.diskWriteOps != null) txt('disk-write-ops', fmtNum(d.diskWriteOps) + ' write ops');
+
+    // ── Network ────────────────────────────────────────────────────
+    txt('net-rx', humanBytes(d.networkRxBytes));
+    txt('net-tx', humanBytes(d.networkTxBytes));
+    if (d.networkRxPackets != null) txt('net-rx-pkt', fmtNum(d.networkRxPackets) + ' packets');
+    if (d.networkTxPackets != null) txt('net-tx-pkt', fmtNum(d.networkTxPackets) + ' packets');
+    txt('net-rx-kbps', fix(d.networkRxKbps, 1) + ' KB/s');
+    txt('net-tx-kbps', fix(d.networkTxKbps, 1) + ' KB/s');
+    if (d.networkRxErrors  != null) txt('net-rx-err',  d.networkRxErrors);
+    if (d.networkTxErrors  != null) txt('net-tx-err',  d.networkTxErrors);
+    if (d.networkRxDropped != null) txt('net-rx-drop', 'Dropped: ' + d.networkRxDropped);
+    if (d.networkTxDropped != null) txt('net-tx-drop', 'Dropped: ' + d.networkTxDropped);
+
+    // ── Containers ─────────────────────────────────────────────────
+    txt('containers', d.activeContainers ?? '—');
+    if (d.containerNames?.length) {
+      html('ctag-list', d.containerNames.map(n => `<span class="ctag">${n}</span>`).join(''));
+    }
+
+    // ── NTP / Time ─────────────────────────────────────────────────
+    if (d.ntpStatus) {
+      txt('ntp-status', d.ntpStatus);
+      $('ntp-status').style.color = d.ntpStatus === 'SYNCED' ? 'var(--accent)' : 'var(--red)';
+    }
+    if (d.systemTime) { txt('sys-clock', d.systemTime); txt('sys-time', 'Server: ' + d.systemTime); }
+    if (d.hostname)     txt('sys-hostname', 'Host: ' + d.hostname);
+
+    // ── Throttle / Voltage ─────────────────────────────────────────
+    if (d.throttleStatus) {
+      const ok = d.throttleStatus === 'NONE' || d.throttleStatus === 'OK';
+      txt('throttle-val', d.throttleStatus);
+      $('throttle-val').style.color = ok ? 'var(--accent)' : 'var(--red)';
+      txt('voltage-sub', d.voltageStatus || '—');
+      html('sysinfo-throttle', `<span class="badge ${ok ? 'g' : 'r'}">${d.throttleStatus}</span>`);
+    }
+
+    // ── System info panel ──────────────────────────────────────────
+    if (d.hostname)      txt('sysinfo-hostname', d.hostname);
+    if (d.kernelVersion) txt('sysinfo-kernel',   d.kernelVersion);
+
+    txt('last-update', 'Updated ' + now());
+    setStatus(true);
+
+    // Log line — all values null-safe
+    const logTemp  = d.cpuTempCelsius    != null ? fix(d.cpuTempCelsius, 1)    + '°C'  : 'N/A';
+    const logRam   = d.memoryUsedPercent != null ? fix(d.memoryUsedPercent, 0) + '%'   : 'N/A';
+    const logDisk  = d.diskUsedPercent   != null ? fix(d.diskUsedPercent, 0)   + '%'   : 'N/A';
+    const logRx    = fix(d.networkRxKbps, 1) + ' KB/s';
+    addLog(`Stats OK — CPU ${logTemp} · RAM ${logRam} · Disk ${logDisk} · RX ${logRx}`, 'log-ok');
+
+  } catch(e) {
+    setStatus(false);
+    addLog('API unreachable: ' + e.message, 'log-err');
+  }
+}
+
+}
+
+function humanBytes(b) {
+  if(!b) return '0 B';
+  if(b<1024) return b+' B';
+  if(b<1024*1024) return (b/1024).toFixed(1)+' KB';
+  if(b<1024*1024*1024) return (b/(1024*1024)).toFixed(1)+' MB';
+  return (b/(1024*1024*1024)).toFixed(2)+' GB';
+}
+
+$('boot-time').textContent = now();
+addLog('Dashboard loaded · polling every 5s');
+fetchStats();
+setInterval(fetchStats, INTERVAL);
+</script>
+</body>
+</html>
