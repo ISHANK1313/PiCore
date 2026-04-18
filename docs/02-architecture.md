@@ -97,10 +97,12 @@ Docker internal
 
 **Total allocated container limits:** ~1.1GB RAM (1036MB from explicit
 `mem_limit` values) across limited containers. Because this exceeds the Pi's
-1GB physical RAM (typically ~50-100MB reserved for GPU), this design relies on
-the configured 2GB swapfile under concurrent load and traffic spikes, with
-reduced performance expected when swapping is active. Containers without
-explicit limits can raise real runtime usage above this baseline.
+1GB physical RAM (minus the configured `gpu_mem` reservation in
+`/boot/config.txt`), this design relies on the configured 2GB swapfile under
+concurrent load and traffic spikes, with reduced performance expected when
+swapping is active. Containers without explicit limits can raise real runtime
+usage above this baseline. This is a known 1GB Pi constraint; for smoother
+always-on concurrent workloads, reduce active services or use a higher-RAM Pi.
 
 ---
 

@@ -55,13 +55,11 @@ To                         Action      From
 ```
 
 **What this means:**
-- SSH and web ingress are allowed through the Tailscale interface only
+- SSH/web ingress is Tailscale-interface scoped (`tailscale0`) for ZTNA
 - LAN-facing interfaces (`eth0`, `wlan0`) deny direct 80/443 access
-- Explicit `DENY` entries are documented as defense-in-depth guardrails so
-  interface restrictions remain obvious even if broader allow rules are added
-- Keep `80/tcp on tailscale0` only when you intentionally enforce an
-  HTTP-to-HTTPS redirect path; otherwise omit that allow rule and expect plain
-  HTTP requests to fail instead of redirecting
+- Explicit `DENY` entries are documented as defense-in-depth guardrails
+- Keep `80/tcp` on `tailscale0` only for HTTP-to-HTTPS redirect; otherwise
+  omit it and let plain HTTP fail
 - This keeps service access aligned with Layer 1 ZTNA instead of broad
   "ALLOW Anywhere" firewall exposure
 - **Optional LAN exception:** if local direct access is intentionally required,
