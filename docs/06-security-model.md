@@ -49,7 +49,7 @@ To                         Action      From
 --                         ------      ----
 22/tcp on tailscale0       ALLOW IN    Anywhere
 443/tcp on tailscale0      ALLOW IN    Anywhere
-80/tcp on tailscale0       ALLOW IN    Anywhere (only if HTTP redirect needed)
+80/tcp on tailscale0       ALLOW IN    Anywhere (enable only when using HTTP→HTTPS redirect)
 80/tcp on eth0,wlan0       DENY IN     Anywhere
 443/tcp on eth0,wlan0      DENY IN     Anywhere
 ```

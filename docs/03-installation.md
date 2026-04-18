@@ -209,6 +209,8 @@ Verify Nextcloud stack containers:
 ```bash
 docker ps --format "table {{.Names}}\t{{.Status}}" | grep -E "nextcloud-app-1|nextcloud-db-1"
 ```
+(`infrastructure/docker-compose-snippet.yml` sets explicit `container_name`, so
+these names stay stable.)
 
 ---
 
